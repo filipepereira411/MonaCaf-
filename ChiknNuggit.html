@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cena Chikn Nuggit na Piscina</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #1e1e24;
+    }
+
+    /* Contentor principal da cena */
+    .canvas {
+      position: relative;
+      width: 320px;
+      height: 560px;
+      background-color: #b5f5a1; /* Fundo verde-claro */
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Borda da piscina */
+    .pool-edge {
+      position: absolute;
+      bottom: 60px;
+      left: -60px;
+      width: 440px;
+      height: 130px;
+      background-color: #9e9c89;
+      border: 4px solid #1a1817;
+      border-radius: 50% 50% 0 0 / 65% 65% 0 0;
+      z-index: 1;
+    }
+
+    /* Linhas das lajes na borda da piscina */
+    .tile-line {
+      position: absolute;
+      width: 4px;
+      height: 45px;
+      background-color: #1a1817;
+      top: 0;
+    }
+    .tile-1 { left: 100px; transform: rotate(-18deg); }
+    .tile-2 { left: 220px; transform: rotate(0deg); }
+    .tile-3 { left: 340px; transform: rotate(18deg); }
+
+    /* Água da piscina */
+    .pool-water {
+      position: absolute;
+      bottom: -40px;
+      left: -60px;
+      width: 440px;
+      height: 160px;
+      background-color: #5bc0c8;
+      border-top: 4px solid #1a1817;
+      border-radius: 50% 50% 0 0 / 55% 55% 0 0;
+      z-index: 4;
+    }
+
+    /* Ondulações na água */
+    .ripple {
+      position: absolute;
+      border-bottom: 3px solid #d4f4f7;
+      border-radius: 50%;
+    }
+    .ripple-1 {
+      width: 65px;
+      height: 20px;
+      top: 32px;
+      left: 145px;
+    }
+    .ripple-2 {
+      width: 75px;
+      height: 22px;
+      top: 34px;
+      left: 225px;
+    }
+
+    /* Personagem (Chikn Nuggit) */
+    .character {
+      position: absolute;
+      top: 130px;
+      left: 45px;
+      width: 220px;
+      height: 360px;
+      z-index: 3;
+    }
+
+    /* Orelhas caídas */
+    .ear {
+      position: absolute;
+      background-color: #fce883;
+      border: 4px solid #1a1817;
+      z-index: 2;
+    }
+    .ear-left {
+      width: 65px;
+      height: 245px;
+      top: 85px;
+      left: -45px;
+      border-radius: 40px 20px 50px 50px;
+      transform: rotate(16deg);
+    }
+    .ear-right {
+      width: 115px;
+      height: 165px;
+      top: 125px;
+      left: 145px;
+      border-radius: 20px 40px 60px 50px;
+      transform: rotate(-32deg);
+    }
+
+    /* Cabeça */
+    .head {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 175px;
+      height: 165px;
+      background-color: #fce883;
+      border: 4px solid #1a1817;
+      border-radius: 52% 48% 45% 55% / 55% 55% 45% 45%;
+      z-index: 5;
+      transform: rotate(-8deg);
+    }
+
+    /* Bochecha saliente */
+    .cheek {
+      position: absolute;
+      top: 72px;
+      right: -12px;
+      width: 45px;
+      height: 55px;
+      background-color: #fce883;
+      border-right: 4px solid #1a1817;
+      border-bottom: 4px solid #1a1817;
+      border-top: 4px solid #1a1817;
+      border-radius: 0 50% 50% 0;
+      z-index: 6;
+    }
+
+    /* Olhos fechados e relaxados */
+    .eye {
+      position: absolute;
+      height: 9px;
+      background-color: #1a1817;
+      border-radius: 10px;
+      top: 75px;
+    }
+    .eye-left {
+      width: 56px;
+      left: 16px;
+      transform: rotate(-12deg);
+    }
+    .eye-right {
+      width: 52px;
+      right: 16px;
+      transform: rotate(14deg);
+    }
+
+    /* Focinho e boca */
+    .nose {
+      position: absolute;
+      top: 79px;
+      left: 82px;
+      width: 12px;
+      height: 8px;
+      background-color: #1a1817;
+      border-radius: 50%;
+    }
+    .mouth {
+      position: absolute;
+      top: 84px;
+      left: 74px;
+      width: 28px;
+      height: 12px;
+      display: flex;
+      justify-content: center;
+    }
+    .mouth::before,
+    .mouth::after {
+      content: "";
+      width: 12px;
+      height: 8px;
+      border-bottom: 3px solid #1a1817;
+      border-left: 3px solid #1a1817;
+      border-right: 3px solid #1a1817;
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* Tronco */
+    .body-torso {
+      position: absolute;
+      top: 150px;
+      left: 38px;
+      width: 112px;
+      height: 135px;
+      background-color: #fce883;
+      border-left: 4px solid #1a1817;
+      border-right: 4px solid #1a1817;
+      border-radius: 30% 30% 40% 40%;
+      z-index: 4;
+    }
+
+    /* Braços cruzados no colo */
+    .arm {
+      position: absolute;
+      width: 48px;
+      height: 22px;
+      background-color: #fce883;
+      border: 4px solid #1a1817;
+      border-radius: 20px;
+      top: 75px;
+    }
+    .arm-left {
+      left: 14px;
+      transform: rotate(28deg);
+    }
+    .arm-right {
+      right: 14px;
+      transform: rotate(-28deg);
+    }
+
+    /* Cauda */
+    .tail {
+      position: absolute;
+      top: 255px;
+      left: 5px;
+      width: 55px;
+      height: 30px;
+      background-color: #fce883;
+      border: 4px solid #1a1817;
+      border-radius: 40px 10px 40px 10px;
+      transform: rotate(-25deg);
+      z-index: 2;
+    }
+
+    /* Pernas e pés dentro de água */
+    .leg {
+      position: absolute;
+      top: 262px;
+      width: 34px;
+      height: 75px;
+      background-color: #fce883;
+      border: 4px solid #1a1817;
+      border-radius: 20px;
+      z-index: 5;
+    }
+    .leg-left {
+      left: 66px;
+    }
+    .leg-right {
+      left: 106px;
+    }
+
+    /* Efeito de submersão dos pés na água */
+    .submerged-feet {
+      position: absolute;
+      bottom: 20px;
+      left: 66px;
+      width: 74px;
+      height: 25px;
+      background-color: rgba(91, 192, 200, 0.72);
+      border-top: 3px solid #ffffff;
+      border-radius: 10px 10px 20px 20px;
+      z-index: 6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="canvas">
+    <!-- Borda da piscina -->
+    <div class="pool-edge">
+      <div class="tile-line tile-1"></div>
+      <div class="tile-line tile-2"></div>
+      <div class="tile-line tile-3"></div>
+    </div>
+
+    <!-- Personagem -->
+    <div class="character">
+      <div class="ear ear-left"></div>
+      <div class="ear ear-right"></div>
+      <div class="tail"></div>
+      
+      <div class="head">
+        <div class="cheek"></div>
+        <div class="eye eye-left"></div>
+        <div class="eye eye-right"></div>
+        <div class="nose"></div>
+        <div class="mouth"></div>
+      </div>
+
+      <div class="body-torso">
+        <div class="arm arm-left"></div>
+        <div class="arm arm-right"></div>
+      </div>
+
+      <div class="leg leg-left"></div>
+      <div class="leg leg-right"></div>
+      <div class="submerged-feet"></div>
+    </div>
+
+    <!-- Água e ondas -->
+    <div class="pool-water">
+      <div class="ripple ripple-1"></div>
+      <div class="ripple ripple-2"></div>
+    </div>
+  </div>
+
+</body>
+</html>
